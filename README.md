@@ -33,3 +33,5 @@ This package implements a formal economic model based on **Surah Yusuf (12:47-48
 pip install -r requirements.txt
 
 [![CI](https://github.com/marcdaghar/yusuf-grondona-entropy/actions/workflows/test.yml/badge.svg)](https://github.com/marcdaghar/yusuf-grondona-entropy/actions/workflows/test.yml)
+
+[![Syntax Check](https://github.com/marcdaghar/yusuf-grondona-entropy/actions/workflows/main.yml/badge.svg)](https://github.com/marcdaghar/yusuf-grondona-entropy/actions/workflows/main.yml)
