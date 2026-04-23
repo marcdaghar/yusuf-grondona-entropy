@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yusuf-grondona-entropy"
+version = "1.0.0"
+description = "Yusuf Counter-Cycle Model - Bimetallic alternative to debt-based money"
+readme = "README.md"
+license = { text = "CC BY-SA 4.0" }
+authors = [{ name = "Marc Daghar", email = "marcdaghar@protonmail.com" }]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.21.0",
+    "matplotlib>=3.4.0",
+    "streamlit>=1.28.0",
+    "plotly>=5.17.0",
+    "pandas>=1.5.0",
+    "scipy>=1.9.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-cov>=4.0"]
+
+[project.urls]
+Homepage = "https://github.com/marcdaghar/yusuf-grondona-entropy"
+Repository = "https://github.com/marcdaghar/yusuf-grondona-entropy.git"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
