@@ -1,0 +1,11 @@
+# High generosity society (like Sadaqa-focused community)
+high_generosity_sim = SadaqaSimulation(n_agents=100)
+for agent in high_generosity_sim.agents:
+    agent.generosity = 0.7  # Very generous
+high_generosity_sim.run(n_steps=1000)
+
+# Low trust society (gift economy may break down)
+low_trust_sim = SadaqaSimulation(n_agents=100, network_density=0.02)
+for agent in low_trust_sim.agents:
+    agent.generosity = 0.1  # Low generosity
+low_trust_sim.run(n_steps=1000)
