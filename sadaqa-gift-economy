@@ -1,0 +1,195 @@
+# sadaqa_simulation.py
+
+class GiftAgent:
+    """
+    An agent in a gift economy, based on Sadaqa and generalized reciprocity.
+    """
+    def __init__(self, agent_id, initial_reputation=0.5):
+        self.id = agent_id
+        self.reputation = initial_reputation  # Social standing
+        self.gift_given_history = []  # Track gifts given (value, to whom)
+        self.gift_received_history = []  # Track gifts received
+        self.merit = 0.0  # Sadaqa merit (spiritual/social credit)
+        self.wealth = 1000.0  # Still need wealth for consumption
+        self.gift_inventory = []  # Inalienable possessions
+        
+    def give_gift(self, recipient, gift_value, gift_type="material", 
+                  expect_return=False):
+        """
+        Give a gift to another agent.
+        
+        Parameters:
+        - gift_type: "material", "immaterial" (compliment), "sacred"
+        - expect_return: False for pure Sadaqa, True for reciprocal gift
+        """
+        # Warm glow effect: utility from giving
+        warm_glow = self.compute_warm_glow(gift_value, gift_type, expect_return)
+        self.merit += warm_glow
+        
+        # Update wealth (if material gift)
+        if gift_type == "material":
+            self.wealth -= gift_value
+            recipient.wealth += gift_value
+        
+        # Update reputation
+        reputation_gain = self.compute_reputation_gain(recipient, gift_value, gift_type)
+        self.reputation += reputation_gain
+        
+        # Record gift
+        self.gift_given_history.append({
+            "to": recipient.id,
+            "value": gift_value,
+            "type": gift_type,
+            "expect_return": expect_return,
+            "time": current_time
+        })
+        
+        # If pure gift, recipient gains reputation but also debt/obligation
+        if not expect_return:
+            recipient.obligations.append({
+                "from": self.id,
+                "value": gift_value,
+                "type": gift_type,
+                "time": current_time
+            })
+        
+        # Trigger neurological effects in recipient
+        recipient.receive_gift(self, gift_value, gift_type)
+        
+    def receive_gift(self, giver, gift_value, gift_type):
+        """Process receiving a gift."""
+        # Oxytocin release: trust increases
+        self.trust_scores[giver.id] = min(1.0, self.trust_scores.get(giver.id, 0.5) + 0.05)
+        
+        # Dopamine release: pleasure from being valued
+        self.happiness += 0.1 * gift_value / self.wealth
+        
+        # Record receipt
+        self.gift_received_history.append({
+            "from": giver.id,
+            "value": gift_value,
+            "type": gift_type,
+            "time": current_time
+        })
+        
+        # If not pure gift (i.e., reciprocal expected), obligation to return
+        # This is the "debt" of the gift economy — different from monetary debt
+    
+    def compute_warm_glow(self, gift_value, gift_type, expect_return):
+        """Compute utility from giving (dopamine release)."""
+        base_glow = 0.1 * gift_value
+        if gift_type == "immaterial":
+            # Compliments create sustained warm glow
+            base_glow *= 1.2
+        if not expect_return:
+            # Pure Sadaqa: greater spiritual reward
+            base_glow *= 1.5
+        return base_glow
+    
+    def compute_reputation_gain(self, recipient, gift_value, gift_type):
+        """Compute social standing gain from giving."""
+        # Moka effect: larger gifts = greater prestige
+        prestige = 0.01 * gift_value
+        
+        # Immaterial gifts grow over repeated interactions (+6% per interaction)
+        if gift_type == "immaterial":
+            n_prior = len([g for g in self.gift_given_history if g["to"] == recipient.id])
+            prestige *= (1 + 0.06 * n_prior)
+        
+        # Pure Sadaqa: greater social recognition
+        if not expect_return:
+            prestige *= 1.3
+        
+        return prestige
+    
+    def decide_to_give(self, potential_recipients, environment):
+        """
+        Decision rule for giving.
+        
+        Based on:
+        - Recipient's reputation/trust (give to trustworthy)
+        - Current merit (higher merit = more likely to give)
+        - Social pressure (if others are giving, you should too)
+        - Pure altruism (Sadaqa: give even without expectation)
+        """
+        # If merit is high, more likely to give pure gifts
+        if self.merit > 0.5:
+            # Pure Sadaqa
+            recipient = self.select_most_needful(potential_recipients)
+            self.give_gift(recipient, gift_value=10.0, expect_return=False)
+            return
+        
+        # Otherwise, reciprocal giving to maintain relationships
+        # Find agent with whom you have outstanding obligations
+        if self.obligations:
+            # Return a gift to clear obligation (or increase it, for Moka)
+            obligation = self.obligations[0]
+            # Return with increment (Moka style)
+            return_value = obligation["value"] * (1 + self.moka_increment)
+            self.give_gift(obligation["from"], return_value, expect_return=True)
+            self.obligations.pop(0)
+    
+
+class GiftEconomy:
+    """
+    Simulates a pure gift economy with Sadaqa-based exchange.
+    """
+    def __init__(self, n_agents=100, initial_wealth=1000):
+        self.agents = [GiftAgent(i, initial_wealth) for i in range(n_agents)]
+        self.time = 0
+        self.network = nx.Graph()  # Trust network
+        self.gift_history = []
+        
+    def step(self):
+        """One time step of the gift economy."""
+        # Randomly select an agent to give
+        giver = random.choice(self.agents)
+        
+        # Select recipient based on social distance, trust, need
+        recipient = self.select_recipient(giver)
+        
+        # Determine gift type and amount
+        gift_type, amount = self.determine_gift(giver, recipient)
+        
+        # Execute gift
+        giver.give_gift(recipient, amount, gift_type, 
+                       expect_return=(gift_type != "sacred"))
+        
+        # Update trust network based on gift outcome
+        self.update_trust_network(giver, recipient, amount)
+        
+        # Record
+        self.gift_history.append((self.time, giver.id, recipient.id, amount, gift_type))
+        
+        self.time += 1
+    
+    def select_recipient(self, giver):
+        """Select recipient based on social criteria."""
+        # Options:
+        # 1. Someone who gave to you recently (reciprocity)
+        # 2. Someone in need (Sadaqa)
+        # 3. Someone with high reputation (to gain prestige)
+        # 4. Someone with low reputation (to raise them up)
+        pass
+    
+    def determine_gift(self, giver, recipient):
+        """Determine gift type and amount."""
+        # Sacred gifts (Sadaqa): no return expected, high merit
+        # Material gifts: standard exchange
+        # Immaterial gifts (compliments): low cost, high social return over time
+        pass
+
+class DebtEconomyComparison:
+    """
+    Compares gift economy vs. debt economy on key metrics:
+    - Wealth inequality (Gini coefficient)
+    - Systemic stability (bankruptcy frequency)
+    - Trust levels (average trust score)
+    - Transaction volume
+    - Reciprocity rate
+    - Collapse probability under shock
+    """
+    def run_comparison(self, n_steps=1000):
+        # Run both simulations parallel
+        # Compare outcomes
+        pass
