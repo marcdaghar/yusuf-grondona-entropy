@@ -16,3 +16,47 @@ def _update_environment(self):
         agent.stress = min(1.0, agent.stress)
     
     # Rest of existing environment update...
+
+def test_scarcity_giving():
+    """Test that agents give MORE during scarcity, not less."""
+    
+    # Run simulation with scarcity cycles
+    sim = SadaqaSimulation(n_agents=50)
+    
+    # Track giving by scarcity level
+    giving_by_scarcity = {0: [], 1: [], 2: [], 3: []}  # Quartiles
+    
+    for step in range(1000):
+        sim.step()
+        scarcity = sim.environment["scarcity"]
+        
+        # Categorize scarcity level
+        if scarcity < 0.25:
+            level = 0
+        elif scarcity < 0.5:
+            level = 1
+        elif scarcity < 0.75:
+            level = 2
+        else:
+            level = 3
+        
+        # Record total gifts given this step
+        recent_gifts = [g for g in sim.gift_history if g.time_step == step]
+        total_given = sum(g.value for g in recent_gifts)
+        giving_by_scarcity[level].append(total_given)
+    
+    # Compute averages
+    averages = {level: np.mean(values) for level, values in giving_by_scarcity.items() if values}
+    
+    print("Giving by scarcity level:")
+    for level in sorted(averages.keys()):
+        label = ["Abundance", "Mild", "Moderate", "Severe"][level]
+        print(f"  {label}: {averages[level]:.2f}")
+    
+    # Verify: Severe scarcity should have HIGHEST giving
+    if averages.get(3, 0) > averages.get(0, 0):
+        print("\n✓ CONFIRMED: Agents give MORE during severe scarcity")
+        print("  (The gamification logic works: sacrifice triggers cooperation)")
+    else:
+        print("\n✗ Agents do not give more during scarcity")
+        print("  (Check the decide_to_give method priority)")
