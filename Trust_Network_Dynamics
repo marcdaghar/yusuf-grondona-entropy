@@ -1,0 +1,5 @@
+# Immaterial gifts create trust that grows with repetition
+if gift_type == GiftType.IMMATERIAL:
+    trust_increase = BASE_TRUST * (1 + 0.06 * (interaction_count // 5))
+else:
+    trust_increase = BASE_TRUST  # Flat
