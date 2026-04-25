@@ -1,0 +1,51 @@
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CLUSTER-GUILD INSURANCE SYSTEM                           │
+│                                                                              │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │                      COMMUNAL STORAGE (Yusuf)                          │ │
+│  │  • Save during abundance                                               │ │
+│  │  • Distribute during scarcity                                          │ │
+│  │  • Counter-cyclical: giving INCREASES when needed most                 │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │                      SADAQA (Voluntary Giving)                         │ │
+│  │  • No coercion, no tax                                                 │ │
+│  │  • Warm glow (dopamine) rewards giver                                  │ │
+│  │  • Trust (oxytocin) bonds giver and receiver                           │ │
+│  │  • During scarcity, giving INCREASES (gamification)                    │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │                      WAQF (Perpetual Endowment)                        │ │
+│  │  • Permanent funding for health, education, environment                │ │
+│  │  • Cannot be sold or inherited—locked to community benefit             │ │
+│  │  • Revenue from BRI infrastructure (ports, roads) reinvested           │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │                      IJARA (Leasing of Productive Tools)               │ │
+│  │  • Access without debt                                                 │ │
+│  │  • Tools remain guild property—cannot be seized for debt               │ │
+│  │  • If member cannot work, lease continues (guild absorbs)              │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │                      MUTUAL AID AGREEMENTS                             │ │
+│  │  • Between guilds within cluster                                       │ │
+│  │  • Between clusters across BRI network                                 │ │
+│  │  • Enforced by trust, reputation, and Hisba regulation                 │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │                      KHARAJ (Limited State Insurance)                  │ │
+│  │  • Only for infrastructure, security, market regulation                │ │
+│  │  • NOT for health, education, environment (these are Sadaqa)           │ │
+│  │  • Scales sub-linearly: government shrinks relative to population      │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
