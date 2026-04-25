@@ -1,0 +1,3 @@
+If defection rate < 30%: System stable
+If defection rate > 30%: Warning, cooperation at risk  
+If defection rate > 50%: System collapse, only ALWAYS_DEFECT survives
