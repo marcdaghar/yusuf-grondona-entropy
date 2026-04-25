@@ -162,3 +162,20 @@ if __name__ == "__main__":
     G = apply_ricci_flow(G, curvatures, dt=0.05)
     print("\nAfter Ricci flow:")
     print(f"Mean weight: {np.mean([G[u][v]['weight'] for u,v in G.edges()]):.3f}")
+def critical_density_search(trust_graph, density_range=np.linspace(0.05, 0.5, 20)):
+    critical_values = []
+    for density in density_range:
+        # Rewire graph to target density while preserving degree sequence
+        graph = rewire_to_density(trust_graph, density)
+        
+        # Run simulation until either:
+        # - System crashes (bankruptcy cascade)
+        # - System stabilizes (survives)
+        
+        survival_rate = monte_carlo_survival(graph)
+        critical_values.append((density, survival_rate))
+    
+    # Find density where survival rate drops sharply
+    threshold = find_phase_transition(critical_values)
+    print(f"Critical density threshold: {threshold}")
+    return threshold
