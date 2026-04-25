@@ -1,0 +1,18 @@
+def _update_environment(self):
+    """Update environment with cyclical scarcity."""
+    
+    # Create periodic scarcity (like Joseph's 7 years of famine)
+    cycle_position = self.time_step % 200  # 200-step cycles
+    if 120 < cycle_position < 180:
+        # Scarcity phase (60 steps of hardship)
+        self.environment["scarcity"] = 0.5 + 0.3 * np.sin(np.pi * (cycle_position - 120) / 60)
+    else:
+        # Abundance phase
+        self.environment["scarcity"] = max(0, 0.1 * np.sin(cycle_position / 50))
+    
+    # Scarcity increases stress for all agents
+    for agent in self.agents:
+        agent.stress += self.environment["scarcity"] * 0.05
+        agent.stress = min(1.0, agent.stress)
+    
+    # Rest of existing environment update...
