@@ -1,0 +1,15 @@
+def should_give_during_scarcity(self, scarcity: float, receiver_id: int) -> Tuple[bool, GiftType]:
+    """
+    During scarcity, prefer immaterial gifts.
+    
+    Rationale: 
+    - Preserves wealth (no transfer)
+    - Builds trust for future when receiver may reciprocate materially
+    - Growing returns over repeated interactions
+    """
+    if scarcity > 0.5:
+        # Strong preference for immaterial during hardship
+        return True, GiftType.IMMATERIAL
+    else:
+        # Normal times: can use material gifts
+        return True, GiftType.MATERIAL
