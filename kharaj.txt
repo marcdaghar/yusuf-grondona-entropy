@@ -9,3 +9,10 @@ text
 Kharaj Revenue = τ * Nf = τ * η * N
 where τ is the Kharaj rate
 Traditional Kharaj rates in Islamic history: 10-20% of produce from land (Umar ibn al-Khattab). For urban establishments, a comparable rate might be 5-10% of gross revenue or a fixed amount per establishment.
+
+Total government size (Kharaj-funded) = weighted average of these functions:
+
+text
+Government_Size(N) = N^β_avg
+where β_avg ≈ 0.92 (sub-linear)
+This means: As cities grow, government becomes a smaller fraction of the economy (economies of scale). This is the opposite of modern welfare states, where government grows faster than population.
