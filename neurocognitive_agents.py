@@ -622,3 +622,403 @@ def compare_ergodicity_demonstration():
 
 if __name__ == "__main__":
     compare_ergodicity_demonstration()
+
+"""
+Nested Process Architecture (Arthur 2023)
+The economy is process, not just quantities.
+Agents execute verb-sequences: search → evaluate → negotiate → execute → learn
+"""
+
+import numpy as np
+from enum import Enum
+from typing import List, Dict, Any, Optional, Tuple
+from dataclasses import dataclass, field
+from collections import deque
+
+class ProcessState(Enum):
+    IDLE = "idle"
+    SEARCHING = "searching"
+    EVALUATING = "evaluating"
+    NEGOTIATING = "negotiating"
+    EXECUTING = "executing"
+    LEARNING = "learning"
+    COMPLETED = "completed"
+
+@dataclass
+class Opportunity:
+    """An economic opportunity discovered through search."""
+    source_agent_id: int
+    target_agent_id: int
+    expected_gain: float
+    risk_level: float
+    trust_score: float
+    description: str = ""
+
+@dataclass
+class ProcessMemory:
+    """Memory of past processes for learning."""
+    action_sequence: List[str]
+    outcome: float
+    context: Dict[str, Any]
+
+class VerbAgent:
+    """
+    An agent that executes nested processes (verbs), not just maximizes utility (nouns).
+    
+    Following Arthur (2023): "Algorithms can contain processes that call or trigger 
+    other processes, inhibit other processes, are nested within processes, indeed 
+    create other processes."
+    """
+    
+    def __init__(self, 
+                 agent_id: int,
+                 initial_wealth: float = 1000.0,
+                 risk_aversion: float = 0.5,
+                 learning_rate: float = 0.1):
+        self.agent_id = agent_id
+        self.wealth = initial_wealth
+        self.risk_aversion = risk_aversion
+        self.learning_rate = learning_rate
+        
+        # Process state
+        self.state = ProcessState.IDLE
+        self.current_opportunity: Optional[Opportunity] = None
+        self.process_stack = deque()  # For nested processes
+        self.memory: List[ProcessMemory] = []
+        
+        # Performance tracking
+        self.process_history = []
+        self.successful_processes = 0
+        self.failed_processes = 0
+        
+        # Trust network (simplified for this implementation)
+        self.trust_scores: Dict[int, float] = {}
+        
+    def step(self, 
+             environment: Dict[str, Any],
+             other_agents: List['VerbAgent']) -> None:
+        """
+        Main step function. The agent executes a process based on current state.
+        This is the verb-based decision loop.
+        """
+        if self.state == ProcessState.COMPLETED:
+            self.state = ProcessState.IDLE
+        
+        if self.state == ProcessState.IDLE:
+            # Initiate a new process: start with search
+            self._start_search(environment)
+        
+        elif self.state == ProcessState.SEARCHING:
+            # Continue or conclude search
+            self._search_phase(environment, other_agents)
+        
+        elif self.state == ProcessState.EVALUATING:
+            self._evaluate_phase()
+        
+        elif self.state == ProcessState.NEGOTIATING:
+            self._negotiate_phase(other_agents)
+        
+        elif self.state == ProcessState.EXECUTING:
+            self._execute_phase()
+        
+        elif self.state == ProcessState.LEARNING:
+            self._learning_phase()
+    
+    def _start_search(self, environment: Dict[str, Any]):
+        """Begin the search process (nested within the main process)."""
+        self.state = ProcessState.SEARCHING
+        self.process_stack.append(("main", "search_started"))
+        self.process_history.append(("search_start", self.wealth))
+        
+    def _search_phase(self, environment: Dict[str, Any], other_agents: List['VerbAgent']):
+        """
+        Search for opportunities.
+        This is itself a process that can involve sub-processes:
+        - Scanning market
+        - Querying known contacts
+        - Receiving signals from the environment
+        """
+        # Sub-process: scan for opportunities
+        opportunities = []
+        
+        # 1. Scan environment signals
+        market_sentiment = environment.get('market_sentiment', 0.5)
+        interest_rate = environment.get('interest_rate', 0.05)
+        
+        # 2. Check potential partners (other agents)
+        for other in other_agents:
+            if other.agent_id == self.agent_id:
+                continue
+            
+            # Get trust score (from memory or network)
+            trust = self.trust_scores.get(other.agent_id, 0.5)
+            
+            # Compute potential gain estimate
+            gain_estimate = (1.0 / (1 + interest_rate)) * trust * (1 - self.risk_aversion)
+            
+            if gain_estimate > 0.05:  # Minimum threshold
+                opportunities.append(Opportunity(
+                    source_agent_id=self.agent_id,
+                    target_agent_id=other.agent_id,
+                    expected_gain=gain_estimate,
+                    risk_level=1 - trust,
+                    trust_score=trust,
+                    description=f"Trade opportunity with agent {other.agent_id}"
+                ))
+        
+        if opportunities:
+            # Best opportunity found (this is a decision, but it's embedded in a process)
+            self.current_opportunity = max(opportunities, key=lambda o: o.expected_gain * o.trust_score)
+            self.state = ProcessState.EVALUATING
+            self.process_history.append(("opportunity_found", self.current_opportunity.expected_gain))
+        else:
+            # No opportunities, process ends
+            self.state = ProcessState.IDLE
+            self.process_stack.clear()
+    
+    def _evaluate_phase(self):
+        """
+        Evaluate the discovered opportunity.
+        This is a nested evaluation process that can involve:
+        - Risk assessment
+        - Comparison with past outcomes (learning)
+        - Cognitive control (pain of paying vs reward)
+        """
+        if self.current_opportunity is None:
+            self.state = ProcessState.IDLE
+            return
+        
+        # Sub-process: risk assessment
+        adjusted_gain = self.current_opportunity.expected_gain * (1 - self.risk_aversion * self.current_opportunity.risk_level)
+        
+        # Check memory for similar past processes
+        similar_memories = [m for m in self.memory 
+                           if abs(m.outcome - adjusted_gain) < 0.1]
+        
+        if similar_memories:
+            # Learning from past: adjust expectation
+            avg_past_outcome = np.mean([m.outcome for m in similar_memories])
+            adjusted_gain = 0.7 * adjusted_gain + 0.3 * avg_past_outcome
+        
+        # Cognitive control: pain of paying vs reward
+        # (from your existing neurocognitive framework, simplified here)
+        pain_of_paying = self.risk_aversion * self.current_opportunity.risk_level * 0.2
+        reward_signal = adjusted_gain
+        
+        self.process_history.append(("evaluation", adjusted_gain))
+        
+        if reward_signal > pain_of_paying and adjusted_gain > 0:
+            self.state = ProcessState.NEGOTIATING
+        else:
+            # Reject opportunity, go back to search or idle
+            self.current_opportunity = None
+            self.state = ProcessState.IDLE
+    
+    def _negotiate_phase(self, other_agents: List['VerbAgent']):
+        """
+        Negotiate terms with the counterparty.
+        This is a nested process that can involve:
+        - Proposing terms
+        - Counter-offers
+        - Trust-based adjustments
+        """
+        if self.current_opportunity is None:
+            self.state = ProcessState.IDLE
+            return
+        
+        target_id = self.current_opportunity.target_agent_id
+        target_agent = next((a for a in other_agents if a.agent_id == target_id), None)
+        
+        if target_agent is None:
+            self.state = ProcessState.IDLE
+            return
+        
+        # Simplified negotiation: propose 50-50 split of expected gain
+        my_share = self.current_opportunity.expected_gain * 0.5
+        their_share = self.current_opportunity.expected_gain * 0.5
+        
+        # Trust modifies the deal
+        my_share *= self.current_opportunity.trust_score
+        their_share *= (2 - self.current_opportunity.trust_score)  # Inverse
+        
+        self.process_history.append(("negotiation", my_share))
+        
+        # Counterparty acceptance (simplified)
+        if target_agent.risk_aversion < 0.7:  # Not too risk-averse
+            self.state = ProcessState.EXECUTING
+        else:
+            # Negotiation failed
+            self.current_opportunity = None
+            self.state = ProcessState.IDLE
+    
+    def _execute_phase(self):
+        """
+        Execute the agreed transaction.
+        This updates wealth and records the outcome.
+        """
+        if self.current_opportunity is None:
+            self.state = ProcessState.IDLE
+            return
+        
+        # Execute transaction
+        gain = self.current_opportunity.expected_gain * np.random.uniform(0.8, 1.2)
+        
+        # Update wealth
+        self.wealth *= (1 + gain)
+        
+        self.process_history.append(("execution", gain))
+        self.process_history.append(("wealth", self.wealth))
+        
+        if gain > 0:
+            self.successful_processes += 1
+            # Update trust (positive outcome increases trust)
+            target_id = self.current_opportunity.target_agent_id
+            current_trust = self.trust_scores.get(target_id, 0.5)
+            self.trust_scores[target_id] = min(1.0, current_trust + self.learning_rate * gain)
+        else:
+            self.failed_processes += 1
+            # Update trust downward
+            target_id = self.current_opportunity.target_agent_id
+            current_trust = self.trust_scores.get(target_id, 0.5)
+            self.trust_scores[target_id] = max(0.0, current_trust - self.learning_rate * abs(gain))
+        
+        # Move to learning phase
+        self.state = ProcessState.LEARNING
+    
+    def _learning_phase(self):
+        """
+        Learn from the completed process.
+        Update internal models based on outcome.
+        """
+        if self.current_opportunity is None:
+            self.state = ProcessState.IDLE
+            return
+        
+        # Store in memory
+        self.memory.append(ProcessMemory(
+            action_sequence=[str(p) for p in self.process_history[-10:]],  # Last 10 steps
+            outcome=self.wealth / self.process_history[0][1] if len(self.process_history) > 1 else 1.0,
+            context={"risk": self.current_opportunity.risk_level, 
+                    "trust": self.current_opportunity.trust_score}
+        ))
+        
+        # Adapt risk aversion based on outcomes (learning)
+        if self.successful_processes > self.failed_processes + 5:
+            # Success: become slightly more risk-seeking
+            self.risk_aversion = max(0.1, self.risk_aversion - 0.01)
+        elif self.failed_processes > self.successful_processes + 5:
+            # Failure: become more risk-averse
+            self.risk_aversion = min(0.95, self.risk_aversion + 0.01)
+        
+        # Clean up and return to idle
+        self.current_opportunity = None
+        self.state = ProcessState.IDLE
+        self.process_stack.clear()
+    
+    def get_process_summary(self) -> Dict[str, Any]:
+        """Return summary of agent's process-based behavior."""
+        return {
+            "agent_id": self.agent_id,
+            "wealth": self.wealth,
+            "successful_processes": self.successful_processes,
+            "failed_processes": self.failed_processes,
+            "risk_aversion": self.risk_aversion,
+            "trust_scores": self.trust_scores,
+            "memory_size": len(self.memory),
+            "last_processes": self.process_history[-5:] if self.process_history else []
+        }
+
+
+def run_verb_based_economy(n_agents: int = 20, 
+                           n_steps: int = 200,
+                           verbose: bool = False):
+    """
+    Run a full verb-based economy with nested processes.
+    """
+    import matplotlib.pyplot as plt
+    
+    # Initialize agents
+    agents = [VerbAgent(i, initial_wealth=1000.0, risk_aversion=0.5 + np.random.uniform(-0.3, 0.3)) 
+              for i in range(n_agents)]
+    
+    # Environment state
+    environment = {
+        'market_sentiment': 0.5,
+        'interest_rate': 0.05,
+        'volatility': 0.1
+    }
+    
+    wealth_history = [[] for _ in range(n_agents)]
+    
+    print("=" * 60)
+    print("VERB-BASED ECONOMY (Arthur 2023: Nested Processes)")
+    print("=" * 60)
+    
+    for step in range(n_steps):
+        # Update environment (endogenous dynamics)
+        if step % 50 == 0 and step > 0:
+            environment['market_sentiment'] += np.random.uniform(-0.1, 0.1)
+            environment['market_sentiment'] = np.clip(environment['market_sentiment'], 0.2, 0.8)
+        
+        # Each agent executes a process
+        for agent in agents:
+            agent.step(environment, agents)
+            wealth_history[agent.agent_id].append(agent.wealth)
+        
+        if verbose and step % 50 == 0:
+            total_wealth = sum(a.wealth for a in agents)
+            successful_total = sum(a.successful_processes for a in agents)
+            failed_total = sum(a.failed_processes for a in agents)
+            print(f"Step {step}: Total Wealth = {total_wealth:.0f}, "
+                  f"Successes = {successful_total}, Failures = {failed_total}")
+    
+    # Visualization
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Wealth trajectories
+    for i, history in enumerate(wealth_history):
+        axes[0].plot(history, alpha=0.5, linewidth=0.8)
+    axes[0].set_xlabel('Time Step')
+    axes[0].set_ylabel('Wealth')
+    axes[0].set_title('Wealth Trajectories of Verb-Based Agents')
+    axes[0].grid(True, alpha=0.3)
+    
+    # Process outcomes
+    success_rates = [a.successful_processes / max(1, a.successful_processes + a.failed_processes) 
+                     for a in agents]
+    axes[1].bar(range(n_agents), success_rates, color='green', alpha=0.7)
+    axes[1].set_xlabel('Agent ID')
+    axes[1].set_ylabel('Success Rate')
+    axes[1].set_title('Process Success Rates by Agent')
+    axes[1].set_ylim(0, 1)
+    axes[1].grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('verb_based_economy.png', dpi=150)
+    plt.show()
+    
+    # Summary stats
+    print("\n" + "=" * 60)
+    print("SIMULATION SUMMARY")
+    print("=" * 60)
+    print(f"Final total wealth: {sum(a.wealth for a in agents):.2f}")
+    print(f"Mean success rate: {np.mean(success_rates):.3f}")
+    print(f"Mean risk aversion: {np.mean([a.risk_aversion for a in agents]):.3f}")
+    print("\nEach agent executed nested processes: SEARCH → EVALUATE → NEGOTIATE → EXECUTE → LEARN")
+    print("This is the verb-based economy Arthur (2023) describes: 'strangely and wonderfully alive'")
+    
+    return agents, environment
+
+
+if __name__ == "__main__":
+    # Test the verb-based economy
+    agents, env = run_verb_based_economy(n_agents=15, n_steps=150, verbose=True)
+    
+    # Show one agent's process details
+    print("\n" + "=" * 60)
+    print("SAMPLE AGENT PROCESS DETAILS")
+    print("=" * 60)
+    agent = agents[0]
+    summary = agent.get_process_summary()
+    for key, value in summary.items():
+        print(f"{key}: {value}")
