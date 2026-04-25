@@ -1,0 +1,18 @@
+def agent_wellbeing(agent):
+    # Economic factors
+    wealth = agent.wealth
+    debt_burden = agent.total_debt  # Should be zero in Ijara model
+    # Guild/Cooperative factors
+    trust_score = agent.local_trust_network_centrality
+    sadaqa_given = agent.sadaqa_this_year
+    # Ijara specific: access to tools without ownership debt
+    tool_access = agent.has_active_ijara_lease / agent.total_tools_needed
+    
+    # Neurological/Cognitive outcome (Sleep Capital)
+    # From Durlauf, this is a "social interaction" effect [citation:1]
+    stress = (wealth * -0.1) + (debt_burden * 10) + (tool_access * -5)
+    # The "warm glow" of giving (Sadaqa) and trust (Oxytocin) are protective
+    oxytocin_effect = (trust_score * 5) + (sadaqa_given * 0.01)
+    
+    sleep_quality = 10 - stress + oxytocin_effect
+    return sleep_quality
