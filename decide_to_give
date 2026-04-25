@@ -1,0 +1,25 @@
+def decide_to_give(self, 
+                   potential_receivers: List['SadaqaAgent'],
+                   environment: Dict[str, Any],
+                   time_step: int) -> Optional[Tuple]:
+    
+    scarcity = environment.get("scarcity", 0.0)
+    
+    # HIGHEST PRIORITY: Give during scarcity (gamification logic)
+    if scarcity > 0.3 and self.should_give_in_scarcity(environment):
+        # Find someone who gave to you before (reciprocity)
+        # Or find the neediest
+        # Or find the most trusted
+        for receiver in potential_receivers:
+            # Check if this receiver gave to you during past scarcity
+            gave_to_me = any(g for g in receiver.gifts_during_scarcity 
+                           if g["to"] == self.id)
+            if gave_to_me:
+                # Return the favor
+                return (receiver, None, None, True, 0.05)  # With small increment
+        
+        # Otherwise, give to the neediest
+        neediest = min(potential_receivers, key=lambda a: a.wealth / (a.reputation + 0.1))
+        return (neediest, None, GiftType.MATERIAL, True)
+    
+    # Rest of existing decision logic...
