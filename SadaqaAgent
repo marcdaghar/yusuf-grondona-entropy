@@ -1,0 +1,151 @@
+def compute_scarcity_giving_boost(self, current_scarcity: float) -> float:
+    """
+    Compute how much scarcity increases the propensity to give.
+    
+    Gamification logic from cooperative survival games:
+    - When scarcity is high (famine, crisis), giving is MORE valuable
+    - The warm glow of giving is amplified during hardship
+    - Recipients remember givers from hard times with deep trust
+    
+    Parameters:
+    - current_scarcity: 0 (abundance) to 1 (famine)
+    
+    Returns:
+    - multiplier for giving utility (1.0 = no effect, >1 = more giving)
+    """
+    if current_scarcity <= 0.2:
+        return 1.0  # Abundance: normal giving
+    
+    # Scarcity amplifies the value of giving
+    # At scarcity = 0.5 (moderate), boost = 1.3
+    # At scarcity = 0.9 (severe), boost = 2.0
+    boost = 1.0 + (current_scarcity * 1.2)
+    
+    return min(boost, 2.5)  # Cap at 2.5x
+
+
+def compute_scarcity_trust_boost(self, current_scarcity: float) -> float:
+    """
+    Trust formed during scarcity is stronger and more durable.
+    
+    Agents who give during hard times are trusted forever.
+    """
+    if current_scarcity <= 0.2:
+        return 1.0
+    
+    # Trust formed during scarcity is multiplied
+    return 1.0 + (current_scarcity * 1.5)
+
+
+def give_during_scarcity(self, 
+                          receiver: 'SadaqaAgent',
+                          environment: Dict[str, Any]) -> bool:
+    """
+    Special giving behavior during scarcity.
+    
+    This is the core gamification mechanism:
+    - Giving during hard times is a sacrifice
+    - But it yields higher dopamine (warm glow)
+    - And creates stronger, longer-lasting trust bonds
+    - Plus, it signals that you are a reliable partner for future cooperation
+    """
+    scarcity = environment.get("scarcity", 0.0)
+    
+    if scarcity < 0.3:
+        # Not scarce enough to trigger special behavior
+        return False
+    
+    # Calculate gift value as a SACRIFICE (percentage of remaining wealth)
+    # More scarcity = larger relative sacrifice expected
+    sacrifice_fraction = 0.1 + (scarcity * 0.2)  # 10% to 30% of wealth
+    gift_value = min(self.wealth * sacrifice_fraction, self.wealth * 0.5)
+    
+    # Cannot give if wealth too low (can't sacrifice what you don't have)
+    if self.wealth < gift_value or self.wealth < 50:
+        # Even the poorest give what they can (e.g., immaterial gift)
+        gift_value = 1.0  # Symbolic gift
+        gift_type = GiftType.IMMATERIAL
+    else:
+        gift_type = GiftType.MATERIAL
+    
+    # SCARCITY AMPLIFIES WARM GLOW (dopamine)
+    warm_glow_multiplier = self.compute_scarcity_giving_boost(scarcity)
+    
+    # Store original compute_warm_glow method to override temporarily
+    original_warm_glow = self.compute_warm_glow
+    
+    def boosted_warm_glow(value, gift_type, expect_return):
+        base = original_warm_glow(value, gift_type, expect_return)
+        return base * warm_glow_multiplier
+    
+    self.compute_warm_glow = boosted_warm_glow.__get__(self)
+    
+    # Execute gift
+    success = self.give_gift(
+        receiver, 
+        gift_value, 
+        gift_type,
+        reciprocity_type=ReciprocityType.GENERALIZED,
+        expect_return=True,  # Creates obligation
+        return_deadline=current_time + 100  # Longer deadline during scarcity
+    )
+    
+    # Restore original method
+    self.compute_warm_glow = original_warm_glow
+    
+    if success:
+        # Scarcity gives also create stronger trust (oxytocin boost)
+        trust_multiplier = self.compute_scarcity_trust_boost(scarcity)
+        if receiver.id in self.trust_scores:
+            self.trust_scores[receiver.id] = min(1.0, 
+                self.trust_scores[receiver.id] * trust_multiplier)
+        
+        # Record that this gift was given during scarcity
+        # This history is used for future trust calculations
+        self.gifts_during_scarcity.append({
+            "to": receiver.id,
+            "value": gift_value,
+            "scarcity_level": scarcity,
+            "time": current_time
+        })
+        
+        # Merit gain is amplified during scarcity
+        self.merit += warm_glow_multiplier * 0.5
+    
+    return success
+
+
+def should_give_in_scarcity(self, environment: Dict[str, Any]) -> bool:
+    """
+    Decision rule for whether to give during scarcity.
+    
+    This is the gamification logic:
+    - If you have given before during scarce times, you are more likely to give again
+    - If you have received help before, you are obligated to give
+    - If you want to be part of the surviving group, you must signal cooperation
+    """
+    scarcity = environment.get("scarcity", 0.0)
+    
+    if scarcity < 0.3:
+        return False
+    
+    # Count how many times you gave during scarcity
+    times_gave_in_scarcity = len(self.gifts_during_scarcity)
+    
+    # If you've never given during scarcity, you SHOULD give now
+    # (otherwise you'll be marked as non-cooperator)
+    if times_gave_in_scarcity == 0:
+        return True
+    
+    # If you have received gifts during scarcity and haven't returned
+    received_in_scarcity = [g for g in self.gifts_received 
+                           if getattr(g, 'scarcity_gift', False)]
+    returned_count = sum(1 for r in received_in_scarcity if r.returned)
+    
+    if len(received_in_scarcity) > returned_count:
+        # You owe returns
+        return True
+    
+    # Stochastic: higher generosity agents give more during scarcity
+    give_probability = self.generosity * (1 + scarcity)
+    return random.random() < give_probability
