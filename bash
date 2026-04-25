@@ -29,3 +29,7 @@ git commit -m "Add CI/CD, unit tests, and pyproject.toml
 - 14 unit tests covering core models, validation, and shocks
 - pyproject.toml with modern Python packaging standards"
 git push origin main
+
+pip install numpy matplotlib networkx
+
+python sadaqa_bri_simulation.py
