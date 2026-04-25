@@ -1,0 +1,11 @@
+Kharaj Tax Base, the number of establishments scales linearly with population:
+
+text
+Nf = η * N
+where η ≈ 21.6 (people per establishment)
+If Kharaj is a tax on land and commercial establishments (not income), the tax base is proportional to Nf. Therefore:
+
+text
+Kharaj Revenue = τ * Nf = τ * η * N
+where τ is the Kharaj rate
+Traditional Kharaj rates in Islamic history: 10-20% of produce from land (Umar ibn al-Khattab). For urban establishments, a comparable rate might be 5-10% of gross revenue or a fixed amount per establishment.
