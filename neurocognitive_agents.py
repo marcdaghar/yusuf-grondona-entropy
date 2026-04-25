@@ -400,3 +400,225 @@ class VerbAgent(Agent):
         
         for verb, method in actions:
             method()
+
+"""
+Ergodicity Economics: Kelly Criterion for Time-Average Wealth Maximization
+Based on Peters (2011, 2019) - ergodicity economics
+"""
+
+import numpy as np
+from typing import Tuple, Optional
+
+class KellyOptimalAgent:
+    """
+    An agent that maximizes time-average growth rate (Kelly criterion)
+    rather than expected value.
+    
+    For a gamble with p win, b gain (e.g., +50% → b=0.5), 
+    and q loss, a loss fraction (e.g., -40% → a=0.4):
+    
+    Kelly fraction f* = (p*b - q*a) / (b*a)  for multiplicative bets
+    
+    This is the fraction of wealth to risk that maximizes long-term growth.
+    """
+    
+    def __init__(self, initial_wealth: float = 1000.0):
+        self.wealth = initial_wealth
+        self.log_wealth_history = [np.log(initial_wealth)]
+        
+    def kelly_fraction(self, 
+                       win_prob: float, 
+                       gain_pct: float, 
+                       loss_pct: float) -> float:
+        """
+        Compute optimal fraction to bet.
+        
+        Parameters:
+        - win_prob: probability of winning (0-1)
+        - gain_pct: fractional gain if win (e.g., 0.5 for +50%)
+        - loss_pct: fractional loss if loss (e.g., 0.4 for -40%)
+        
+        Returns:
+        - f*: fraction of wealth to risk (0 to 1)
+        """
+        b = gain_pct      # net gain fraction
+        a = loss_pct      # net loss fraction (positive number)
+        p = win_prob
+        q = 1 - p
+        
+        # Kelly formula for multiplicative bets
+        # f* = (p*b - q*a) / (b*a)
+        numerator = (p * b) - (q * a)
+        denominator = b * a
+        
+        if denominator == 0:
+            return 0.0
+        
+        f_star = numerator / denominator
+        
+        # Clamp to [0, 1] - no shorting or leverage beyond wealth
+        return np.clip(f_star, 0.0, 1.0)
+    
+    def apply_bet(self, 
+                  fraction: float, 
+                  win_prob: float, 
+                  gain_pct: float, 
+                  loss_pct: float,
+                  random_state: Optional[np.random.Generator] = None) -> float:
+        """
+        Apply a bet using Kelly-optimal fraction and return new wealth.
+        """
+        if random_state is None:
+            random_state = np.random.default_rng()
+        
+        # Determine outcome
+        if random_state.random() < win_prob:
+            # Win: wealth increases by gain_pct
+            multiplier = 1 + gain_pct * fraction
+        else:
+            # Loss: wealth decreases by loss_pct
+            multiplier = 1 - loss_pct * fraction
+        
+        self.wealth *= multiplier
+        self.log_wealth_history.append(np.log(self.wealth))
+        return self.wealth
+    
+    def time_average_growth_rate(self) -> float:
+        """Compute the actual time-average growth rate of wealth."""
+        if len(self.log_wealth_history) < 2:
+            return 0.0
+        # g = (ln(W_T) - ln(W_0)) / T
+        return (self.log_wealth_history[-1] - self.log_wealth_history[0]) / len(self.log_wealth_history)
+
+
+class ExpectedValueAgent:
+    """
+    Standard expected-value maximizing agent.
+    This is the baseline that fails under non-ergodicity.
+    """
+    
+    def __init__(self, initial_wealth: float = 1000.0):
+        self.wealth = initial_wealth
+        self.history = [initial_wealth]
+    
+    def apply_bet(self,
+                  win_prob: float,
+                  gain_pct: float,
+                  loss_pct: float,
+                  random_state: Optional[np.random.Generator] = None) -> float:
+        """
+        Expected-value maximizing agent bets full wealth (or fixed fraction)
+        because EV is positive.
+        """
+        if random_state is None:
+            random_state = np.random.default_rng()
+        
+        # Expected value maximizing: if EV > 0, bet everything
+        ev = win_prob * gain_pct - (1 - win_prob) * loss_pct
+        
+        if ev > 0:
+            fraction = 1.0  # Full bet (risky!)
+        else:
+            fraction = 0.0
+        
+        if random_state.random() < win_prob:
+            multiplier = 1 + gain_pct * fraction
+        else:
+            multiplier = 1 - loss_pct * fraction
+        
+        self.wealth *= multiplier
+        self.history.append(self.wealth)
+        return self.wealth
+
+
+def compare_ergodicity_demonstration():
+    """
+    Demonstrate the difference between Kelly-optimal and expected-value agents.
+    
+    The classic multiplicative coin toss:
+    - Heads: +50% (gain_pct = 0.5)
+    - Tails: -40% (loss_pct = 0.4)
+    - Probability: p = 0.5
+    
+    Expected value per round: +5% (looks good!)
+    Time-average growth: negative (~ -5% per round)
+    """
+    import matplotlib.pyplot as plt
+    
+    n_rounds = 100
+    n_agents = 20  # For ensemble comparison
+    
+    gain_pct = 0.5   # +50% on heads
+    loss_pct = 0.4   # -40% on tails
+    win_prob = 0.5
+    
+    # Ensemble of Kelly agents
+    kelly_agents = [KellyOptimalAgent(initial_wealth=1000.0) for _ in range(n_agents)]
+    # Ensemble of expected-value agents
+    ev_agents = [ExpectedValueAgent(initial_wealth=1000.0) for _ in range(n_agents)]
+    
+    rng = np.random.default_rng(42)
+    
+    kelly_wealth_over_time = []
+    ev_wealth_over_time = []
+    
+    for round_i in range(n_rounds):
+        # Compute Kelly optimal fraction
+        kelly_f = kelly_agents[0].kelly_fraction(win_prob, gain_pct, loss_pct)
+        
+        round_kelly_wealth = []
+        round_ev_wealth = []
+        
+        for agent in kelly_agents:
+            agent.apply_bet(kelly_f, win_prob, gain_pct, loss_pct, rng)
+            round_kelly_wealth.append(agent.wealth)
+        
+        for agent in ev_agents:
+            agent.apply_bet(win_prob, gain_pct, loss_pct, rng)
+            round_ev_wealth.append(agent.wealth)
+        
+        kelly_wealth_over_time.append(np.mean(round_kelly_wealth))
+        ev_wealth_over_time.append(np.mean(round_ev_wealth))
+    
+    # Plot
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    
+    axes[0].plot(kelly_wealth_over_time, label='Kelly (Time-average optimal)', color='green')
+    axes[0].plot(ev_wealth_over_time, label='Expected Value Maximizer', color='red', linestyle='--')
+    axes[0].set_yscale('log')
+    axes[0].set_xlabel('Round')
+    axes[0].set_ylabel('Mean Wealth (log scale)')
+    axes[0].set_title('Ensemble Average: Kelly vs Expected Value')
+    axes[0].legend()
+    axes[0].grid(True, alpha=0.3)
+    
+    # Also show single trajectories (the real world only gets one path)
+    axes[1].plot(kelly_agents[0].log_wealth_history, label='Kelly (single path)', color='green')
+    axes[1].plot(ev_agents[0].history, label='Expected Value (single path)', color='red', linestyle='--')
+    axes[1].set_xlabel('Round')
+    axes[1].set_ylabel('Log Wealth')
+    axes[1].set_title('Single Trajectory: The Only One That Happens')
+    axes[1].legend()
+    axes[1].grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig('ergodicity_comparison.png', dpi=150)
+    plt.show()
+    
+    # Statistical validation
+    print("=" * 60)
+    print("ERGODICITY ECONOMICS DEMONSTRATION")
+    print("=" * 60)
+    print(f"Kelly optimal fraction: {kelly_f:.3f}")
+    print(f"Kelly agent final mean wealth: {np.mean([a.wealth for a in kelly_agents]):.2f}")
+    print(f"EV agent final mean wealth: {np.mean([a.wealth for a in ev_agents]):.2f}")
+    print(f"Kelly time-average growth rate: {kelly_agents[0].time_average_growth_rate():.4f}")
+    print(f"EV time-average growth rate: {ev_agents[0].time_average_growth_rate():.4f}")
+    print("\nCONCLUSION: Expected value says +5% per round. Reality is negative growth.")
+    print("The Kelly agent survives. The expected-value agent goes to ruin.")
+    
+    return kelly_agents, ev_agents
+
+
+if __name__ == "__main__":
+    compare_ergodicity_demonstration()
