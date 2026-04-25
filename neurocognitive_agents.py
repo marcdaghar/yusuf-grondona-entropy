@@ -384,3 +384,19 @@ if __name__ == "__main__":
         model.schedule.step()
     
     print("Neurocognitive agents test completed")
+
+class VerbAgent(Agent):
+    def step(self):
+        # Not just choosing a noun (amount to invest)
+        # But executing a verb-sequence:
+        
+        actions = [
+            ("search_for_opportunity", self.scan_market()),
+            ("evaluate_trust", self.check_graph_curvature()),
+            ("negotiate_term", self.propose_rate()),
+            ("execute_transaction", self.exchange()),
+            ("update_belief", self.learn_from_outcome())
+        ]
+        
+        for verb, method in actions:
+            method()
