@@ -1,0 +1,44 @@
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    EVOLUTIONARY BIOLOGY OF THE GUILD                         │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                         ENVIRONMENT                                   │   │
+│  │  (Resource availability, market demand, scarcity cycles, trust)      │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                    GENETIC ALGORITHM (Holland)                        │   │
+│  │  • Selection: Successful guilds reproduce their practices            │   │
+│  │  • Crossover: Guilds exchange practices through trade & mutual aid   │   │
+│  │  • Mutation: Innovation (new tools, new Ijara terms)                 │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                         CLUSTER-GUILD                                 │   │
+│  │                                                                        │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                   │   │
+│  │  │   Family 1  │  │   Family 2  │  │   Family 3  │  ...              │   │
+│  │  │  (members)  │  │  (members)  │  │  (members)  │                   │   │
+│  │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘                   │   │
+│  │         │                │                │                           │   │
+│  │         ▼                ▼                ▼                           │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                   │   │
+│  │  │   Ijara     │  │   Ijara     │  │   Ijara     │                   │   │
+│  │  │   Leasing   │  │   Leasing   │  │   Leasing   │                   │   │
+│  │  │   Pool      │  │   Pool      │  │   Pool      │                   │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘                   │   │
+│  │                                                                        │   │
+│  │  Trust network (Sadaqa) | Credit assignment (bucket brigade)          │   │
+│  │  Nested capabilities (Bustos et al.) | Mutual aid (Yusuf storage)     │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                    BRI INFRASTRUCTURE (Waqf)                          │   │
+│  │  • Roads, ports, railways as perpetual endowments                    │   │
+│  │  • Revenue reinvested in health, education, environment              │   │
+│  │  • Kharaj for state functions (security, regulation, infrastructure) │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────┘
