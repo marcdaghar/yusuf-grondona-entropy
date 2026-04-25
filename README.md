@@ -27,6 +27,17 @@ This package implements a formal economic model based on **Surah Yusuf (12:47-48
 
 ---
 
+"This work presents a formal agent-based model of alternative economic 
+institutions based on Islamic principles (Yusuf counter-cyclical rule, 
+Sadaqa, Waqf, Kharaj, Hisba). The model is evaluated using scaling laws 
+from urban economics (Youn et al. 2014) and evolutionary game theory. 
+The results contribute to the scientific understanding of:
+(1) resilience under scarcity, (2) voluntary provision of common goods, 
+(3) optimal government size under sub-linear scaling, and (4) market 
+integrity through decentralized regulation. This is a theoretical 
+contribution to complexity economics and does not advocate for or 
+against any existing political system."
+
 ## Installation
 
 ```bash
