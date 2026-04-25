@@ -1,0 +1,15 @@
+from sadaqa_simulation import SadaqaSimulation
+from yusuf_model import YusufSimulation  # Your existing model
+
+# Run gift economy
+gift_sim = SadaqaSimulation(n_agents=100, allow_market=False)
+gift_results = gift_sim.run(n_steps=1000)
+
+# Run debt economy (your existing capitalist system)
+debt_sim = YusufSimulation(system_type="capitalist")
+debt_results = debt_sim.run(n_steps=1000)
+
+# Compare
+from sadaqa_simulation import DebtEconomyComparison
+comparison = DebtEconomyComparison.compare(gift_sim, debt_results)
+DebtEconomyComparison.visualize_comparison(comparison)
