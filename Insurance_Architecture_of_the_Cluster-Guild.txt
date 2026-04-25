@@ -49,3 +49,43 @@
 │  │  • Scales sub-linearly: government shrinks relative to population      │ │
 │  └────────────────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ISLAMIC POLITICAL ECONOMY (YOUR MODEL)                   │
+│                                                                              │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │                          LAND (Kharaj)                                  │ │
+│  │  • Taxed by government (not owned)                                      │ │
+│  │  • Waqf (trust) for community benefit                                   │ │
+│  │  • Cannot be sold, securitized, or inherited as private property        │ │
+│  │  • Encourages labor-limited production (lower inequality)               │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │                          LABOR (No Tax)                                 │ │
+│  │  • No income tax, no payroll tax, no labor taxation of any kind         │ │
+│  │  • Labor's full reward belongs to laborer and their guild               │ │
+│  │  • Labor mobility is high (no tax penalty for moving)                   │ │
+│  │  • Encourages labor-limited dynamics (lower inequality)                 │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │                          GUILD (Insurance)                              │ │
+│  │  • Extended family structure                                            │ │
+│  │  • Provides: sickness, disability, old age, unemployment, death        │ │
+│  │  • Funded by: Sadaqa (voluntary), Ijara (leasing fees), mutual aid     │ │
+│  │  • Enforced by: trust, reputation, Hisba (not courts)                   │ │
+│  │  • No state involvement, no taxation                                    │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                         │
+│                                    ▼                                         │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │                          GOVERNMENT (Limited)                           │ │
+│  │  • Funded by Kharaj (land tax) ONLY                                     │ │
+│  │  • Provides: infrastructure, security, market regulation (Hisba)       │ │
+│  │  • Does NOT provide: health, education, environment, welfare           │ │
+│  │  • Scales sub-linearly (smaller relative to population as cities grow)  │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
