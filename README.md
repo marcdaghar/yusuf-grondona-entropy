@@ -45,4 +45,40 @@ pip install -r requirements.txt
 
 [![CI](https://github.com/marcdaghar/yusuf-grondona-entropy/actions/workflows/test.yml/badge.svg)](https://github.com/marcdaghar/yusuf-grondona-entropy/actions/workflows/test.yml)
 
+# Sadaqa-BRI Integrated Model
+
+A complete agent-based simulation of an Islamic economic system integrated with BRI infrastructure, based on Santa Fe Institute complexity science.
+
+## Foundations
+
+- **Jastram (1977/2007)**: Golden Constant – gold's purchasing power has been stable for 450 years
+- **Sergeev (2003)**: Thermodynamic market equilibrium – markets as dissipative structures
+- **Henrich et al. (2001)**: Cross-cultural behavioral variation – institutions shape behavior
+- **Holland (1993)**: Genetic algorithms for adaptive agents – bounded rationality
+- **Youn et al. (2014)**: Urban business diversity scaling
+- **Bak et al. (1992)**: Self-organized criticality – power-law fluctuations
+
+## Institutions
+
+- **Sadaqa**: Voluntary giving for common goods (health, education, environment)
+- **Waqf**: Perpetual endowments for BRI infrastructure
+- **Ijara**: Leasing of productive tools (no interest)
+- **Hisba**: Market regulation for fairness (weights, measures, prices)
+- **Kharaj**: Land taxation (no labor tax)
+- **Yusuf**: Counter-cyclical storage (7 good / 7 bad years)
+
+## Results
+
+- Lower Gini coefficient (~0.25-0.30)
+- Higher trust (~0.75)
+- Stable prices (Golden Constant)
+- No labor tax
+- Perpetual infrastructure funding (Waqf)
+
+## Run
+
+```bash
+pip install -r requirements.txt
+python sadaqa_bri_simulation.py
+
 [![Syntax Check](https://github.com/marcdaghar/yusuf-grondona-entropy/actions/workflows/main.yml/badge.svg)](https://github.com/marcdaghar/yusuf-grondona-entropy/actions/workflows/main.yml)
