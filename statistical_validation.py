@@ -174,23 +174,7 @@ class BootstrapAnalyzer:
             "prob_yusuf_better": prob_yusuf_better,
             "significant_95": ci_lower > 0 or ci_upper < 0
         }
-
-
 if __name__ == "__main__":
-    validator = StatisticalValidator()
-    results = validator.run_validation(n_simulations=50)
-    
-    print("=" * 60)
-    print("STATISTICAL VALIDATION")
-    print("=" * 60)
-    print(f"Based on {results['n_simulations']} simulations")
-    print(f"Yusuf mean stock: {results['yusuf_mean_stock']:.3f}")
-    print(f"Capitalist mean stock: {results['capitalist_mean_stock']:.3f}")
-    print(f"Yusuf solvency: {results['yusuf_solvency']:.1f}%")
-    print(f"Capitalist solvency: {results['capitalist_solvency']:.1f}%")
-    print("\nStatistical tests:")
-
-   if __name__ == "__main__":
     validator = StatisticalValidator()
     results = validator.run_validation(n_simulations=50)
     
@@ -206,3 +190,5 @@ if __name__ == "__main__":
     for test in results['tests']:
         sig = "✓" if test['significant'] else "✗"
         print(f"  {sig} {test['test_name']}: p={test['p_value']:.4f} ({test['interpretation']})")
+
+
