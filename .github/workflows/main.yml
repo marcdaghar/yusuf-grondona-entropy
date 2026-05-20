@@ -9,6 +9,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check Python syntax
         run: |
+          set -e
+          echo "Checking syntax of Python files..."
+          # Utilise find au lieu de *.py pour éviter les problèmes de fichier non régulier
           find . -name "*.py" -type f -print0 | while IFS= read -r -d '' file; do
             python -m py_compile "$file"
             echo "✅ $file: valid syntax"
