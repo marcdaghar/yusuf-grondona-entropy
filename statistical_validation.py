@@ -190,21 +190,19 @@ if __name__ == "__main__":
     print(f"Capitalist solvency: {results['capitalist_solvency']:.1f}%")
     print("\nStatistical tests:")
 
-    def ergodicity_test(simulation_runs, time_steps):
-    # Ensemble average: across runs at final time
-    ensemble_mean = np.mean([run.wealth[-1] for run in simulation_runs])
+   if __name__ == "__main__":
+    validator = StatisticalValidator()
+    results = validator.run_validation(n_simulations=50)
     
-    # Time average: within a single long run
-    single_run = simulation_runs[0]
-    time_mean = np.mean(single_run.wealth)
-    
-    divergence = abs(ensemble_mean - time_mean) / ensemble_mean
-    
-    if divergence > threshold:
-        print(f"System is non-ergodic (divergence = {divergence})")
-        print("Expected value reasoning fails. Time-average growth matters.")
-    
-    return divergence
+    print("=" * 60)
+    print("STATISTICAL VALIDATION")
+    print("=" * 60)
+    print(f"Based on {results['n_simulations']} simulations")
+    print(f"Yusuf mean stock: {results['yusuf_mean_stock']:.3f}")
+    print(f"Capitalist mean stock: {results['capitalist_mean_stock']:.3f}")
+    print(f"Yusuf solvency: {results['yusuf_solvency']:.1f}%")
+    print(f"Capitalist solvency: {results['capitalist_solvency']:.1f}%")
+    print("\nStatistical tests:")
     for test in results['tests']:
         sig = "✓" if test['significant'] else "✗"
         print(f"  {sig} {test['test_name']}: p={test['p_value']:.4f} ({test['interpretation']})")
