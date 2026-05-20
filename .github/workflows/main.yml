@@ -1,24 +1,8 @@
-name: Syntax Check Only
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-jobs:
-  syntax-check:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Check Python syntax only
-      run: |
-        echo "Checking syntax of Python files..."
-        for file in *.py; do
-          python -m py_compile "$file" 2>/dev/null
-          if [ $? -eq 0 ]; then
-            echo "✅ $file: valid syntax"
-          else
-            python -m py_compile "$file"
-          fi
-        done
+- name: Check Python syntax only
+  run: |
+    set -e
+    echo "Checking syntax of Python files..."
+    find . -name "*.py" -type f -print0 | while IFS= read -r -d '' file; do
+      python -m py_compile "$file"
+      echo "✅ $file: valid syntax"
+    done
