@@ -16,4 +16,3 @@ jobs:
             python -m py_compile "$file"
             echo "✅ $file: valid syntax"
           done
-find . -name "*.py" -type f -not -path "./currency_aesthetics/*" -print0 | while IFS= read -r -d '' file; do
