@@ -1,8 +1,15 @@
-- name: Check Python syntax only
-  run: |
-    set -e
-    echo "Checking syntax of Python files..."
-    find . -name "*.py" -type f -print0 | while IFS= read -r -d '' file; do
-      python -m py_compile "$file"
-      echo "✅ $file: valid syntax"
-    done
+name: Python syntax check
+
+on: [push, pull_request]
+
+jobs:
+  syntax-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Python syntax
+        run: |
+          find . -name "*.py" -type f -print0 | while IFS= read -r -d '' file; do
+            python -m py_compile "$file"
+            echo "✅ $file: valid syntax"
+          done
