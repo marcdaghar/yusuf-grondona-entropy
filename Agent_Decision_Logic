@@ -1,15 +1,61 @@
-def should_give_during_scarcity(self, scarcity: float, receiver_id: int) -> Tuple[bool, GiftType]:
+ def should_save_and_give(self, production: float, stock: float, scarcity: float, 
+                          receiver_id: int) -> Tuple[bool, float, Optional[GiftType]]:
     """
-    During scarcity, prefer immaterial gifts.
+    Décision de l'agent en fonction de la phase du cycle (Yusuf rule).
     
-    Rationale: 
-    - Preserves wealth (no transfer)
-    - Builds trust for future when receiver may reciprocate materially
-    - Growing returns over repeated interactions
+    - Phase d'ABONDANCE (production > P_bar) : L'agent épargne le maximum.
+      Comportement "égoïste" : il stocke pour lui-même et donne peu.
+    - Phase de PÉNURIE (production < P_underline) : L'agent puise dans son épargne.
+      Comportement "solidaire" : il consomme et partage ce qu'il a stocké.
+    - Phase NORMALE : Comportement neutre (consommation = production).
     """
-    if scarcity > 0.5:
-        # Strong preference for immaterial during hardship
-        return True, GiftType.IMMATERIAL
+    
+    # Seuils définis dans le modèle (ex: config.P_bar, config.P_underline)
+    P_bar = self.config.P_bar
+    P_underline = self.config.P_underline
+    
+    # 1. Décision d'épargne
+    if production > P_bar:
+        # ABONDANCE : Épargne maximale (comportement "égoïste")
+        # On ne consomme que le strict minimum, tout le surplus va au stock
+        save_rate = 0.9  # 90% du surplus est épargné
+        give_probability = 0.1  # On donne très peu en abondance
+        
+    elif production < P_underline:
+        # PÉNURIE : On puise dans l'épargne (comportement "solidaire")
+        # On consomme le stock pour survivre et aider les autres
+        save_rate = -0.5  # On désépargne (consommation > production)
+        give_probability = 0.7  # On donne beaucoup en pénurie (grâce aux stocks passés)
+        
     else:
-        # Normal times: can use material gifts
-        return True, GiftType.MATERIAL
+        # NORMALE : Consommation = production, pas d'épargne nette
+        save_rate = 0.0
+        give_probability = 0.3  # Don modéré en temps normal
+    
+    # Mise à jour du stock individuel
+    new_stock = stock + (production - self.min_consumption) * save_rate
+    new_stock = max(0, new_stock)  # Le stock ne peut pas être négatif
+    
+    # 2. Décision de donner (Sadaqa) basée sur le stock accumulé
+    # La solidarité en pénurie est d'autant plus forte qu'on a bien épargné
+    if scarcity > 0.5:  # Pénurie
+        # Plus on a de stock, plus on donne
+        giving_power = min(1.0, new_stock / self.config.need)
+        give_probability *= (1 + giving_power)
+    else:
+        # En abondance ou normal, on donne peu
+        give_probability *= 0.2
+    
+    # 3. Décision finale
+    will_give = np.random.random() < give_probability
+    if will_give:
+        # En pénurie, on privilégie les dons immatériels (soutien moral, conseil)
+        # En abondance, les dons matériels (nourriture, argent)
+        if scarcity > 0.5:
+            gift_type = GiftType.IMMATERIAL  # Soutien, conseil, lien social
+        else:
+            gift_type = GiftType.MATERIAL    # Ressources, biens
+    else:
+        gift_type = None
+    
+    return new_stock, save_rate, gift_type
